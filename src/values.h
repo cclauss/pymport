@@ -38,6 +38,14 @@
     info[arg].As<Napi::Function>();                                                                                    \
   })
 
+#ifdef DEBUG
+#define LOG(...) fprintf(stderr, __VA_ARGS__)
+#define LINEINFO +std::string(__FILE__) + ":" + std::to_string(__LINE__)
+#else
+#define LOG(...)
+#define LINEINFO
+#endif
+
 #define THROW_IF_NULL(val)                                                                                             \
   if ((PyObject *)val == nullptr) {                                                                                    \
     auto err = PyErr_Occurred();                                                                                       \
@@ -47,22 +55,16 @@
       PyErr_Fetch(&type, &v, &trace);                                                                                  \
       PyObject *pstr = PyObject_Str(v);                                                                                \
       const char *py_err_msg = PyUnicode_AsUTF8(pstr);                                                                 \
-      std::string err_msg = std::string("Python exception: ") + py_err_msg;                                            \
+      std::string err_msg = std::string("Python exception ") LINEINFO + " : " + py_err_msg;                            \
       throw Napi::Error::New(env, err_msg);                                                                            \
     }                                                                                                                  \
-    throw Napi::TypeError::New(                                                                                        \
-      env, std::string("Failed converting value at ") + std::string(__FILE__) + ":" + std::to_string(__LINE__));       \
+    throw Napi::TypeError::New(env, std::string("Failed converting value at ") LINEINFO);                              \
   }
 
 #define DEBUG_PY_PRINT(o, msg)                                                                                         \
   {                                                                                                                    \
-    printf("%s %p: ", msg, o);                                                                                         \
+    printf(                                                                                                            \
+      "%s (%s) %p (%d): ", msg, Py_TYPE((PyObject *)o)->tp_name, (PyObject *)o, (int)(((PyObject *)o)->ob_refcnt));    \
     PyObject_Print(o, stdout, 0);                                                                                      \
     printf("\n\n");                                                                                                    \
   }
-
-#ifdef DEBUG
-#define LOG(...) fprintf(stderr, __VA_ARGS__)
-#else
-#define LOG(...)
-#endif

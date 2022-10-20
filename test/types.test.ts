@@ -260,7 +260,7 @@ describe('types', () => {
         });
     });
 
-    describe('functions', () => {
+    describe('function', () => {
         it('typeOf', () => {
             const fn = np.get('ones');
             assert.instanceOf(fn, PyObject);
@@ -287,4 +287,19 @@ describe('types', () => {
             assert.equal(loader, loader.toJS());
         });
     });
+
+    describe('class', () => {
+        it('class', () => {
+            const array = np.get('ndarray').toJS();
+            assert.isFunction(array.prototype.tolist);
+        });
+
+        it('class object', () => {
+            const npJS = np.toJS();
+
+            const a = npJS.arange(15).toJS().reshape(3, 5).toJS();
+            console.log(a);
+        });
+    });
+
 });

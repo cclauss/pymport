@@ -48,6 +48,12 @@ class PyObj : public Napi::ObjectWrap<PyObj> {
 
   void Release();
   static Napi::Value _ToJS(Napi::Env, PyObject *, NapiObjectStore &);
+  static Napi::Value _ToJS_Class(Napi::Env env, PyObject *py, NapiObjectStore &store);
+  static Napi::Value _ToJS_List(Napi::Env env, PyObject *py, NapiObjectStore &store);
+  static Napi::Value _ToJS_Dictionary(Napi::Env env, PyObject *py, NapiObjectStore &store);
+  static Napi::Value _ToJS_Tuple(Napi::Env env, PyObject *py, NapiObjectStore &store);
+  static Napi::Value _ToJS_ClassObject(Napi::Env env, PyObject *py, NapiObjectStore &store);
+
   static PyObject *_FromJS(Napi::Value, PyObjectStore &);
   static PyObject *_Dictionary(Napi::Object, PyObject *, PyObjectStore &);
   static PyObject *_List(Napi::Array, PyObject *, PyObjectStore &);
