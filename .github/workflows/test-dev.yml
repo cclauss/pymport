@@ -10,6 +10,52 @@ on:
     branches: ["*"]
 
 jobs:
+  shared_python:
+    runs-on: ${{ matrix.platform }}
+
+    strategy:
+      matrix:
+        platform: [ubuntu-20.04, macos-11, windows-2019]
+        node-version: [16.x, 18.x]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: npm install --ignore-scripts
+      - run: npx @mapbox/node-pre-gyp configure
+      - run: npx @mapbox/node-pre-gyp build -j max
+      - run: python3 -m pip install --upgrade pip
+      - run: pip3 install -r test/requirements.txt
+      - run: npm test
+
+  builtin_python:
+    runs-on: ${{ matrix.platform }}
+
+    strategy:
+      matrix:
+        platform: [ubuntu-20.04, macos-11, windows-2019]
+        node-version: [16.x, 18.x]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install --ignore-scripts
+      - run: npx @mapbox/node-pre-gyp configure --builtin-python=true
+      - run: npx @mapbox/node-pre-gyp build -j max
+      - run: node ./scripts/pympip install --upgrade pip
+      - run: node ./scripts/pympip install -r test/requirements.txt
+      - run: npm test
+
   external_python:
     runs-on: ${{ matrix.platform }}
 
@@ -19,10 +65,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js 16.x
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
@@ -46,10 +92,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js 16.x
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
@@ -76,10 +122,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js 16.x
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
@@ -104,7 +150,7 @@ jobs:
 
     strategy:
       matrix:
-        platform: [macos-11, windows-2019, ubuntu-latest]
+        platform: [macos-11, windows-2019]
 
     steps:
       - uses: actions/checkout@v3
@@ -116,7 +162,7 @@ jobs:
         with:
           python-version: "3.10"
       - run: npm install --ignore-scripts
-      - run: npx @mapbox/node-pre-gyp configure
+      - run: npx @mapbox/node-pre-gyp configure --debug
       - run: npx @mapbox/node-pre-gyp build -j max
       - run: python3 -m pip install --upgrade pip
       - run: pip3 install -r test/requirements.txt
@@ -127,10 +173,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js 16.x
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - run: npm install --ignore-scripts
       - run: npx node-pre-gyp configure --debug --enable_coverage
       - run: npx node-pre-gyp build
