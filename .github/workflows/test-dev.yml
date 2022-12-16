@@ -31,5 +31,5 @@ jobs:
           python-version: ${{ matrix.python_version }}
       - run: echo LDFLAGS=`python3-config --ldflags --embed` >> $GITHUB_ENV
       - run: echo CFLAGS=`python3-config --cflags --embed` >> $GITHUB_ENV
-      - run: gcc ${CFLAGS} python_test.c -o python_test ${LDFAGS}
+      - run: gcc ${CFLAGS} python_test.c -o python_test ${LDFLAGS}
       - run: ./python_test
