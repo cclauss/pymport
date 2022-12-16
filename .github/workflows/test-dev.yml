@@ -11,13 +11,24 @@ on:
 
 jobs:
   shared_python:
-    runs-on: macos-11
+    runs-on: ${{ matrix.platform }}
+
+    strategy:
+      matrix:
+        platform:
+          - ubuntu-20.04
+          - ubuntu-22.04
+          - macos-11
+          - macos-12
+          - windows-2019
+          - windows-2022
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
 
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.8
+          python-version: ${{ matrix.python_version }}
       - run: echo LDFLAGS=`python3-config --ldflags --embed` >> $GITHUB_ENV
       - run: echo CFLAGS=`python3-config --cflags --embed` >> $GITHUB_ENV
       - run: gcc ${CFLAGS} python_test.c -o python_test ${LDFAGS}
