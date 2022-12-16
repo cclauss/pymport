@@ -12,8 +12,10 @@ on:
 jobs:
   shared_python:
     runs-on: ${{ matrix.platform }}
+    continue-on-error: true
 
     strategy:
+      fail-fast: false
       matrix:
         platform:
           - ubuntu-20.04
